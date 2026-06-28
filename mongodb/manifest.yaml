@@ -1,0 +1,88 @@
+apiVersion: v1
+kind: Service
+metadata: 
+  name: mongodb-headless
+  namespace: roboshop
+  labels:
+    project: roboshop
+    tier: database
+    component: mongodb
+spec:
+  clusterIP: None
+  selector:
+  #lables are used as selectors
+    project: roboshop
+    tier: database
+    component: mongodb
+  ports:
+    - protocol: TCP
+      port: 27017 # service port
+      targetPort: 27017 # container port
+
+---
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongodb
+  namespace: roboshop
+  labels:
+    project: roboshop
+    tier: database
+    component: mongodb
+
+spec:
+  selector:
+    matchLabels:
+      project: roboshop
+      tier: database
+      component: mongodb # has to match .spec.template.metadata.labels
+  serviceName: "mongodb-headless" # we should attch headless service 
+  replicas: 3 # by default is 1
+  # pod definition
+  template:
+    metadata:
+      labels:
+        project: roboshop
+        tier: database
+        component: mongodb # has to match .spec.selector.matchLabels
+    spec:
+      containers:
+      - name: mongodb
+        image: vinod1618/mongodb:1.6.0
+        volumeMounts:
+        - name: mongodb
+          mountPath: /data/db
+    
+    # PVC
+  volumeClaimTemplates:
+  - metadata:
+      name: mongodb
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "roboshop-ebs"
+      resources:
+        requests:
+          storage: 1Gi
+
+---
+
+apiVersion: v1
+kind: Service
+metadata: 
+  name: mongodb
+  namespace: roboshop
+  labels:
+    project: roboshop
+    tier: database
+    component: mongodb
+spec:
+  selector:
+  #lables are used as selectors
+    project: roboshop
+    tier: database
+    component: mongodb
+  ports:
+    - protocol: TCP
+      port: 27017 # service port
+      targetPort: 27017 # container port
