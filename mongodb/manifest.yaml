@@ -38,7 +38,7 @@ spec:
       tier: database
       component: mongodb # has to match .spec.template.metadata.labels
   serviceName: "mongodb-headless" # we should attch headless service 
-  replicas: 3 # by default is 1
+  replicas: 1 # by default is 1
   # pod definition
   template:
     metadata:
