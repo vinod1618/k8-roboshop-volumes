@@ -49,7 +49,7 @@ spec:
     spec:
       containers:
       - name: mongodb
-        image: vinod1618/mongodb:1.6.0
+        image: vinod1618/mongodb:1.0.0
         volumeMounts:
         - name: mongodb
           mountPath: /data/db
